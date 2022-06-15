@@ -47,7 +47,7 @@ void cmdline_logging() {
 }
 
 // LTO will optimize out the NOP function
-#if MAGISK_DEBUG
+#if SHAPER_DEBUG
 void LOGD(const char *fmt, ...) { LOG_BODY(d) }
 #else
 void LOGD(const char *fmt, ...) {}

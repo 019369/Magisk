@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.topjohnwu.magisk.ui.settings.DownloadPath" />
+            type="com.zzqy.shaper.ui.settings.DownloadPath" />
 
     </data>
 

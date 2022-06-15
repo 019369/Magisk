@@ -1,5 +1,5 @@
 ##################################
-# Magisk app internal scripts
+# Shaper app internal scripts
 ##################################
 
 run_delay() {
@@ -7,14 +7,14 @@ run_delay() {
 }
 
 env_check() {
-  for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
-    [ -f "$MAGISKBIN/$file" ] || return 1
+  for file in busybox shaperboot shaperinit util_functions.sh boot_patch.sh; do
+    [ -f "$SHAPERBIN/$file" ] || return 1
   done
   if [ "$2" -ge 24302 ]; then
-    [ -f "$MAGISKBIN/magiskpolicy" ] || return 1
+    [ -f "$SHAPERBIN/shaperpolicy" ] || return 1
   fi
-  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
-  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 1
+  grep -xqF "SHAPER_VER='$1'" "$SHAPERBIN/util_functions.sh" || return 1
+  grep -xqF "SHAPER_VER_CODE=$2" "$SHAPERBIN/util_functions.sh" || return 1
   return 0
 }
 
@@ -38,12 +38,12 @@ cp_readlink() {
 
 fix_env() {
   # Cleanup and make dirs
-  rm -rf $MAGISKBIN/*
-  mkdir -p $MAGISKBIN 2>/dev/null
+  rm -rf $SHAPERBIN/*
+  mkdir -p $SHAPERBIN 2>/dev/null
   chmod 700 $NVBASE
-  cp_readlink $1 $MAGISKBIN
+  cp_readlink $1 $SHAPERBIN
   rm -rf $1
-  chown -R 0:0 $MAGISKBIN
+  chown -R 0:0 $SHAPERBIN
 }
 
 direct_install() {
@@ -77,7 +77,7 @@ run_uninstaller() {
 
 restore_imgs() {
   [ -z $SHA1 ] && return 1
-  local BACKUPDIR=/data/magisk_backup_$SHA1
+  local BACKUPDIR=/data/shaper_backup_$SHA1
   [ -d $BACKUPDIR ] || return 1
 
   get_flags
@@ -112,18 +112,18 @@ EOF
 
 add_hosts_module() {
   # Do not touch existing hosts module
-  [ -d $MAGISKTMP/modules/hosts ] && return
-  cd $MAGISKTMP/modules
+  [ -d $SHAPERTMP/modules/hosts ] && return
+  cd $SHAPERTMP/modules
   mkdir -p hosts/system/etc
   cat << EOF > hosts/module.prop
 id=hosts
 name=Systemless Hosts
 version=1.0
 versionCode=1
-author=Magisk
-description=Magisk app built-in systemless hosts module
+author=Shaper
+description=Shaper app built-in systemless hosts module
 EOF
-  magisk --clone /system/etc/hosts hosts/system/etc/hosts
+  shaper --clone /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update
   cd /
 }
@@ -219,7 +219,7 @@ app_init() {
   mount_partitions
   get_flags
   run_migrations
-  SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
+  SHA1=$(grep_prop SHA1 $SHAPERTMP/config)
   check_boot_ramdisk && RAMDISKEXIST=true || RAMDISKEXIST=false
   check_encryption
   # Make sure RECOVERYMODE has value

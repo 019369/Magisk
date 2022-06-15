@@ -125,7 +125,7 @@ sepolicy *sepolicy::compile_split() {
     FILE *f;
     int policy_ver;
     const char *cil_file;
-#if MAGISK_DEBUG
+#if SHAPER_DEBUG
     cil_set_log_level(CIL_INFO);
 #endif
     cil_set_log_handler(+[](int lvl, const char *msg) {

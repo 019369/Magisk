@@ -123,10 +123,10 @@ int su_client_main(int argc, char *argv[]) {
                 su_req.shell = optarg;
                 break;
             case 'V':
-                printf("%d\n", MAGISK_VER_CODE);
+                printf("%d\n", SHAPER_VER_CODE);
                 exit(EXIT_SUCCESS);
             case 'v':
-                printf("%s\n", MAGISK_VERSION ":MAGISKSU");
+                printf("%s\n", SHAPER_VERSION ":MAGISKSU");
                 exit(EXIT_SUCCESS);
             case 'z':
                 // Do nothing, placed here for legacy support :)

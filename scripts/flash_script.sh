@@ -1,6 +1,6 @@
-#MAGISK
+#SHAPER
 ############################################
-# Magisk Flash Script (updater-script)
+# Shaper Flash Script (updater-script)
 ############################################
 
 ##############
@@ -29,12 +29,12 @@ setup_flashable
 # Detection
 ############
 
-if echo $MAGISK_VER | grep -q '\.'; then
-  PRETTY_VER=$MAGISK_VER
+if echo $SHAPER_VER | grep -q '\.'; then
+  PRETTY_VER=$SHAPER_VER
 else
-  PRETTY_VER="$MAGISK_VER($MAGISK_VER_CODE)"
+  PRETTY_VER="$SHAPER_VER($SHAPER_VER_CODE)"
 fi
-print_title "Magisk $PRETTY_VER Installer"
+print_title "Shaper $PRETTY_VER Installer"
 
 is_mounted /data || mount /data || is_mounted /cache || mount /cache
 mount_partitions
@@ -48,7 +48,7 @@ ui_print "- Target image: $BOOTIMAGE"
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 21 ] && abort "! Magisk only support Android 5.0 and above"
+[ $API -lt 21 ] && abort "! Shaper only support Android 5.0 and above"
 
 ui_print "- Device platform: $ABI"
 
@@ -56,7 +56,7 @@ BINDIR=$INSTALLER/lib/$ABI
 cd $BINDIR
 for file in lib*.so; do mv "$file" "${file:3:${#file}-6}"; done
 cd /
-cp -af $INSTALLER/lib/$ABI32/libmagisk32.so $BINDIR/magisk32 2>/dev/null
+cp -af $INSTALLER/lib/$ABI32/libshaper32.so $BINDIR/shaper32 2>/dev/null
 cp -af $CHROMEDIR/. $BINDIR/chromeos
 chmod -R 755 $BINDIR
 
@@ -70,17 +70,17 @@ $BOOTMODE || remove_system_su
 ui_print "- Constructing environment"
 
 # Copy required files
-rm -rf $MAGISKBIN/* 2>/dev/null
-mkdir -p $MAGISKBIN 2>/dev/null
-cp -af $BINDIR/. $COMMONDIR/. $BBBIN $MAGISKBIN
-chmod -R 755 $MAGISKBIN
+rm -rf $SHAPERBIN/* 2>/dev/null
+mkdir -p $SHAPERBIN 2>/dev/null
+cp -af $BINDIR/. $COMMONDIR/. $BBBIN $SHAPERBIN
+chmod -R 755 $SHAPERBIN
 
 # addon.d
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
   mount -o rw,remount /system || mount -o rw,remount /
-  ADDOND=/system/addon.d/99-magisk.sh
+  ADDOND=/system/addon.d/99-shaper.sh
   cp -af $COMMONDIR/addon.d.sh $ADDOND
   chmod 755 $ADDOND
 fi
@@ -89,7 +89,7 @@ fi
 # Image Patching
 ##################
 
-install_magisk
+install_shaper
 
 # Cleanups
 $BOOTMODE || recovery_cleanup

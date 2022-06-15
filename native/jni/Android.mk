@@ -4,10 +4,10 @@ LOCAL_PATH := $(call my-dir)
 # Binaries
 ########################
 
-ifdef B_MAGISK
+ifdef B_SHAPER
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magisk
+LOCAL_MODULE := shaper
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libnanopb \
@@ -63,7 +63,7 @@ endif
 ifdef B_INIT
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magiskinit
+LOCAL_MODULE := shaperinit
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libcompat \
@@ -86,7 +86,7 @@ endif
 ifdef B_BOOT
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magiskboot
+LOCAL_MODULE := shaperboot
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libcompat \
@@ -117,7 +117,7 @@ endif
 ifdef B_POLICY
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := magiskpolicy
+LOCAL_MODULE := shaperpolicy
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libbase \

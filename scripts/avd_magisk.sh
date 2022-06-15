@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #####################################################################
-#   AVD Magisk Setup
+#   AVD Shaper Setup
 #####################################################################
 #
 # Support emulator ABI: x86_64 and arm64
@@ -9,14 +9,14 @@
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py emulator
 #
-# This script will stop zygote, simulate the Magisk start up process
+# This script will stop zygote, simulate the Shaper start up process
 # that would've happened before zygote was started, and finally
 # restart zygote. This is useful for setting up the emulator for
-# developing Magisk, testing modules, and developing root apps using
+# developing Shaper, testing modules, and developing root apps using
 # the official Android emulator (AVD) instead of a real device.
 #
-# This only covers the "core" features of Magisk. For testing
-# magiskinit, please checkout avd_patch.sh.
+# This only covers the "core" features of Shaper. For testing
+# shaperinit, please checkout avd_patch.sh.
 #
 #####################################################################
 
@@ -54,30 +54,30 @@ unzip -oj app-debug.apk 'assets/util_functions.sh'
 
 api_level_arch_detect
 
-unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
+unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libshaper32.so" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
 done
 
 # Stop zygote (and previous setup if exists)
-magisk --stop 2>/dev/null
+shaper --stop 2>/dev/null
 stop
-if [ -d /dev/avd-magisk ]; then
-  umount -l /dev/avd-magisk 2>/dev/null
-  rm -rf /dev/avd-magisk 2>/dev/null
+if [ -d /dev/avd-shaper ]; then
+  umount -l /dev/avd-shaper 2>/dev/null
+  rm -rf /dev/avd-shaper 2>/dev/null
 fi
 
 # SELinux stuffs
 if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
-  ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
+  ./shaperpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
 elif [ -f /sepolicy ]; then
-  ./magiskpolicy --load /sepolicy --live --magisk 2>&1
+  ./shaperpolicy --load /sepolicy --live --magisk 2>&1
 else
-  ./magiskpolicy --live --magisk 2>&1
+  ./shaperpolicy --live --magisk 2>&1
 fi
 
-MAGISKTMP=/sbin
+SHAPERTMP=/sbin
 
 # Setup bin overlay
 if mount | grep -q rootfs; then
@@ -111,43 +111,43 @@ elif [ -e /sbin ]; then
   rm -rf /dev/sysroot
 else
   # Android Q+ without sbin
-  MAGISKTMP=/dev/avd-magisk
-  mkdir /dev/avd-magisk
-  mount -t tmpfs -o 'mode=0755' tmpfs /dev/avd-magisk
+  SHAPERTMP=/dev/avd-shaper
+  mkdir /dev/avd-shaper
+  mount -t tmpfs -o 'mode=0755' tmpfs /dev/avd-shaper
 fi
 
-# Magisk stuff
-mkdir -p $MAGISKBIN 2>/dev/null
+# Shaper stuff
+mkdir -p SHAPERBIN 2>/dev/null
 unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' \
--x 'assets/bootctl' -x 'assets/main.jar' -d $MAGISKBIN
+-x 'assets/bootctl' -x 'assets/main.jar' -d SHAPERBIN
 mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
 
-for file in magisk32 magisk64 magiskpolicy; do
+for file in shaper32 shaper64 shaperpolicy; do
   chmod 755 ./$file
-  cp -af ./$file $MAGISKTMP/$file
-  cp -af ./$file $MAGISKBIN/$file
+  cp -af ./$file $SHAPERTMP/$file
+  cp -af ./$file SHAPERBIN/$file
 done
-cp -af ./magiskboot $MAGISKBIN/magiskboot
-cp -af ./magiskinit $MAGISKBIN/magiskinit
-cp -af ./busybox $MAGISKBIN/busybox
+cp -af ./shaperboot SHAPERBIN/shaperboot
+cp -af ./shaperinit SHAPERBIN/shaperinit
+cp -af ./busybox SHAPERBIN/busybox
 
-ln -s ./magisk64 $MAGISKTMP/magisk
-ln -s ./magisk $MAGISKTMP/su
-ln -s ./magisk $MAGISKTMP/resetprop
-ln -s ./magisk $MAGISKTMP/magiskhide
-ln -s ./magiskpolicy $MAGISKTMP/supolicy
+ln -s ./shaper64 $SHAPERTMP/shaper
+ln -s ./shaper $SHAPERTMP/su
+ln -s ./shaper $SHAPERTMP/resetprop
+ln -s ./shaper $SHAPERTMP/shaperhide
+ln -s ./shaperpolicy $SHAPERTMP/supolicy
 
-./magiskinit -x manager $MAGISKTMP/stub.apk
+./shaperinit -x manager $SHAPERTMP/stub.apk
 
-mkdir -p $MAGISKTMP/.magisk/mirror
-mkdir $MAGISKTMP/.magisk/block
-touch $MAGISKTMP/.magisk/config
+mkdir -p $SHAPERTMP/.shaper/mirror
+mkdir $SHAPERTMP/.shaper/block
+touch $SHAPERTMP/.shaper/config
 
 # Boot up
-$MAGISKTMP/magisk --post-fs-data
-while [ ! -f /dev/.magisk_unblock ]; do sleep 1; done
-rm /dev/.magisk_unblock
+$SHAPERTMP/shaper --post-fs-data
+while [ ! -f /dev/.shaper_unblock ]; do sleep 1; done
+rm /dev/.shaper_unblock
 start
-$MAGISKTMP/magisk --service
+$SHAPERTMP/shaper --service

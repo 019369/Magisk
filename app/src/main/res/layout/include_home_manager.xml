@@ -5,13 +5,13 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.core.Info" />
+        <import type="com.zzqy.shaper.core.Info" />
 
-        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+        <import type="com.zzqy.shaper.ui.home.MagiskState" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+            type="com.zzqy.shaper.ui.home.HomeViewModel" />
 
     </data>
 
@@ -159,7 +159,7 @@
                                 android:id="@+id/home_manager_extra_connection_value"
                                 style="@style/W.Home.ItemContent.Right"
                                 android:text="@{context.packageName}"
-                                tools:text="com.topjohnwu.magisk" />
+                                tools:text="com.zzqy.shaper" />
 
                         </LinearLayout>
 

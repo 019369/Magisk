@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     umask(0);
 
     auto name = basename(argv[0]);
-    if (name == "magisk"sv)
+    if (name == "shaper"sv)
         return magisk_proxy_main(argc, argv);
 
     if (argc > 1 && argv[1] == "-x"sv) {

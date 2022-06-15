@@ -147,7 +147,7 @@ int magisk_log(int prio, const char *fmt, va_list ap) {
             close(logd_fd.exchange(-1));
         }
     }
-    __android_log_write(prio, "Magisk", buf);
+    __android_log_write(prio, "Shaper", buf);
 
     return len;
 }
@@ -175,7 +175,7 @@ void magisk_logging() {
     log_cb.ex = nop_ex;
 }
 
-#define alog(prio) [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
+#define alog(prio) [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_##prio, "Shaper", fmt, ap); }
 void android_logging() {
     log_cb.d = alog(DEBUG);
     log_cb.i = alog(INFO);

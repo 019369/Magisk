@@ -12,7 +12,7 @@ using namespace std;
     fprintf(stderr,
 R"EOF(DenyList Config CLI
 
-Usage: magisk --denylist [action [arguments...] ]
+Usage: shaper --denylist [action [arguments...] ]
 Actions:
    status          Return the enforcement status
    enable          Enable denylist enforcement
@@ -85,7 +85,7 @@ int denylist_cli(int argc, char **argv) {
         xunshare(CLONE_NEWNS);
         xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
         int fd = connect_daemon(MainRequest::GET_PATH);
-        MAGISKTMP = read_string(fd);
+        SHAPERTMP = read_string(fd);
         close(fd);
         revert_unmount();
         execvp(argv[2], argv + 2);

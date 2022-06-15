@@ -57,7 +57,7 @@ static void second_stage_entry() {
     ZLOGD("inject 2nd stage\n");
 
     char path[PATH_MAX];
-    MAGISKTMP = getenv(MAGISKTMP_ENV);
+    SHAPERTMP = getenv(MAGISKTMP_ENV);
     int fd = parse_int(getenv(MAGISKFD_ENV));
 
     snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
@@ -233,7 +233,7 @@ static void connect_companion(int client, bool is_64_bit) {
         socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds);
         zygiskd_socket = fds[0];
         if (fork_dont_care() == 0) {
-            string exe = MAGISKTMP + "/magisk" + (is_64_bit ? "64" : "32");
+            string exe = SHAPERTMP + "/shaper" + (is_64_bit ? "64" : "32");
             // This fd has to survive exec
             fcntl(fds[1], F_SETFD, 0);
             char buf[16];
@@ -303,7 +303,7 @@ static void setup_files(int client, const sock_cred *cred) {
 
     write_int(client, 0);
     send_fd(client, is_64_bit ? app_process_64 : app_process_32);
-    write_string(client, MAGISKTMP);
+    write_string(client, SHAPERTMP);
 }
 
 static void magiskd_passthrough(int client) {

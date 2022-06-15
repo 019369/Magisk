@@ -76,26 +76,26 @@ void restorecon() {
 }
 
 void restore_tmpcon() {
-    if (MAGISKTMP == "/system/bin") {
+    if (SHAPERTMP == "/system/bin") {
         // Running with emulator.sh
         if (SDK_INT >= 26)
-            lsetfilecon("/system/bin/magisk", EXEC_CON);
+            lsetfilecon("/system/bin/shaper", EXEC_CON);
         return;
     }
 
-    if (MAGISKTMP == "/sbin")
-        setfilecon(MAGISKTMP.data(), ROOT_CON);
+    if (SHAPERTMP == "/sbin")
+        setfilecon(SHAPERTMP.data(), ROOT_CON);
     else
-        chmod(MAGISKTMP.data(), 0700);
+        chmod(SHAPERTMP.data(), 0700);
 
-    auto dir = xopen_dir(MAGISKTMP.data());
+    auto dir = xopen_dir(SHAPERTMP.data());
     int dfd = dirfd(dir.get());
 
     for (dirent *entry; (entry = xreaddir(dir.get()));)
         setfilecon_at(dfd, entry->d_name, SYSTEM_CON);
 
     if (SDK_INT >= 26) {
-        string magisk = MAGISKTMP + "/magisk";
+        string magisk = SHAPERTMP + "/shaper";
         setfilecon(magisk.data(), EXEC_CON);
     }
 }

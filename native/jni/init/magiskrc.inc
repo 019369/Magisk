@@ -15,13 +15,13 @@ constexpr char MAGISK_RC[] =
 "    rm " UNBLOCKFILE "\n"
 "\n"
 
-"service %2$s %1$s/magisk --post-fs-data\n"
+"service %2$s %1$s/shaper --post-fs-data\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
 "    oneshot\n"
 "\n"
 
-"service %3$s %1$s/magisk --service\n"
+"service %3$s %1$s/shaper --service\n"
 "    class late_start\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
@@ -32,7 +32,7 @@ constexpr char MAGISK_RC[] =
 "    start %4$s\n"
 "\n"
 
-"service %4$s %1$s/magisk --boot-complete\n"
+"service %4$s %1$s/shaper --boot-complete\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
 "    oneshot\n"

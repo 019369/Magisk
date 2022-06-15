@@ -5,17 +5,17 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.R" />
+        <import type="com.zzqy.shaper.R" />
 
-        <import type="com.topjohnwu.magisk.core.Config" />
+        <import type="com.zzqy.shaper.core.Config" />
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.module.LocalModuleRvItem" />
+            type="com.zzqy.shaper.ui.module.LocalModuleRvItem" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
+            type="com.zzqy.shaper.ui.module.ModuleViewModel" />
 
     </data>
 

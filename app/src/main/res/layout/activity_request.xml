@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.surequest.SuRequestViewModel" />
+            type="com.zzqy.shaper.ui.surequest.SuRequestViewModel" />
 
     </data>
 
@@ -90,7 +90,7 @@
                         android:minWidth="200dp"
                         android:text="@{viewModel.packageName}"
                         android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                        tools:text="com.topjohnwu.magisk" />
+                        tools:text="com.zzqy.shaper" />
                 </LinearLayout>
             </LinearLayout>
 

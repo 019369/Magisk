@@ -61,7 +61,7 @@ private fun PrintStream.byteField(name: String, bytes: ByteArray) {
 fun genKeyData(keysDir: File, outSrc: File) {
     outSrc.parentFile.mkdirs()
     PrintStream(outSrc).use {
-        it.println("package com.topjohnwu.magisk.signing;")
+        it.println("package com.zzqy.shaper.signing;")
         it.println("public final class KeyData {")
 
         it.byteField("testCert", File(keysDir, "testkey.x509.pem").readBytes())
@@ -196,7 +196,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         pkgDir.mkdirs()
         PrintStream(File(pkgDir, "$name.java")).use {
             it.println("package $pkg;")
-            it.println("public class $name extends com.topjohnwu.magisk.$type {}")
+            it.println("public class $name extends com.zzqy.shaper.$type {}")
         }
     }
 
@@ -217,7 +217,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
 }
 
 fun genEncryptedResources(res: InputStream, outDir: File) {
-    val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
+    val mainPkgDir = File(outDir, "com/zzqy/shaper")
     mainPkgDir.mkdirs()
 
     // Generate iv and key
@@ -232,12 +232,12 @@ fun genEncryptedResources(res: InputStream, outDir: File) {
 
     res.use {
         CipherOutputStream(bos, cipher).use { os ->
-            it.transferTo(os)
+            it.copyTo(os)
         }
     }
 
     PrintStream(File(mainPkgDir, "Bytes.java")).use {
-        it.println("package com.topjohnwu.magisk;")
+        it.println("package com.zzqy.shaper;")
         it.println("public final class Bytes {")
 
         it.byteField("key", key)

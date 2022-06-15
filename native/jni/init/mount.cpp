@@ -149,7 +149,7 @@ void MagiskInit::mount_rules_dir() {
     strcpy(p, "/data/unencrypted");
     if (xaccess(path, F_OK) == 0) {
         // FBE, need to use an unencrypted path
-        custom_rules_dir = path + "/magisk"s;
+        custom_rules_dir = path + "/shaper"s;
     } else {
         // Skip if /data/adb does not exist
         strcpy(p, SECURE_DIR);
@@ -177,7 +177,7 @@ cache:
     }
     if (!do_mount("ext4"))
         goto metadata;
-    custom_rules_dir = path + "/magisk"s;
+    custom_rules_dir = path + "/shaper"s;
     goto success;
 
 metadata:
@@ -187,7 +187,7 @@ metadata:
     strcpy(p, "/metadata");
     if (setup_block() < 0 || !do_mount("ext4"))
         goto persist;
-    custom_rules_dir = path + "/magisk"s;
+    custom_rules_dir = path + "/shaper"s;
     goto success;
 
 persist:
@@ -197,7 +197,7 @@ persist:
     strcpy(p, "/persist");
     if (setup_block() < 0 || !do_mount("ext4"))
         return;
-    custom_rules_dir = path + "/magisk"s;
+    custom_rules_dir = path + "/shaper"s;
 
 success:
     // Create symlinks so we don't need to go through this logic again
@@ -286,7 +286,7 @@ void BaseInit::exec_init() {
 }
 
 void MagiskInit::setup_tmp(const char *path) {
-    LOGD("Setup Magisk tmp at %s\n", path);
+    LOGD("Setup Shaper tmp at %s\n", path);
     xmount("tmpfs", path, "tmpfs", 0, "mode=755");
 
     chdir(path);
@@ -303,8 +303,8 @@ void MagiskInit::setup_tmp(const char *path) {
 
     // Create applet symlinks
     for (int i = 0; applet_names[i]; ++i)
-        xsymlink("./magisk", applet_names[i]);
-    xsymlink("./magiskpolicy", "supolicy");
+        xsymlink("./shaper", applet_names[i]);
+    xsymlink("./shaperpolicy", "supolicy");
 
     chdir("/");
 }

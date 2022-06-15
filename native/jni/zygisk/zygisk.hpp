@@ -8,7 +8,7 @@
 #define INJECT_ENV_1   "MAGISK_INJ_1"
 #define INJECT_ENV_2   "MAGISK_INJ_2"
 #define MAGISKFD_ENV   "MAGISKFD"
-#define MAGISKTMP_ENV  "MAGISKTMP"
+#define MAGISKTMP_ENV  "SHAPERTMP"
 
 namespace ZygiskRequest {
 enum : int {

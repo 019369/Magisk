@@ -7,7 +7,7 @@ using namespace std;
 
 [[noreturn]] static void usage(char *arg0) {
     fprintf(stderr,
-R"EOF(MagiskPolicy - SELinux Policy Patch Tool
+R"EOF(ShaperPolicy - SELinux Policy Patch Tool
 
 Usage: %s [--options...] [policy statements...]
 
@@ -19,7 +19,7 @@ Options:
    --compile-split   compile split cil policies
    --save FILE       dump monolithic sepolicy to FILE
    --live            immediately load sepolicy into the kernel
-   --magisk          apply built-in Magisk sepolicy rules
+   --shaper          apply built-in Shaper sepolicy rules
    --apply FILE      apply rules from FILE, read and parsed
                      line by line as policy statements
                      (multiple --apply are allowed)
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     const char *out_file = nullptr;
     vector<string_view> rule_files;
     sepolicy *sepol = nullptr;
-    bool magisk = false;
+    bool shaper = false;
     bool live = false;
 
     if (argc < 2) usage(argv[0]);
@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
             auto option = argv[i] + 2;
             if (option == "live"sv)
                 live = true;
-            else if (option == "magisk"sv)
-                magisk = true;
+            else if (option == "shaper"sv)
+                shaper = true;
             else if (option == "load"sv) {
                 if (argv[i + 1] == nullptr)
                     usage(argv[0]);
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (magisk)
-        sepol->magisk_rules();
+    if (shaper)
+        sepol->shaper_rules();
 
     if (!rule_files.empty())
         for (const auto &rule_file : rule_files)

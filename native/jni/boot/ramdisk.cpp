@@ -11,7 +11,7 @@ static const char *UNSUPPORT_LIST[] =
           "boot/sbin/launch_daemonsu.sh" };
 
 static const char *MAGISK_LIST[] =
-        { ".backup/.magisk", "init.magisk.rc",
+        { ".backup/.shaper", "init.magisk.rc",
           "overlay/init.magisk.rc" };
 
 class magisk_cpio : public cpio {
@@ -96,7 +96,7 @@ char *magisk_cpio::sha1() {
                     return strdup(sha1);
                 }
             }
-        } else if (e.first == ".backup/.magisk") {
+        } else if (e.first == ".backup/.shaper") {
             for_each_line(line, e.second->data, e.second->filesize) {
                 if (str_starts(line, "SHA1=")) {
                     strncpy(sha1, line + 5, 40);
@@ -126,7 +126,7 @@ void magisk_cpio::restore() {
     for (auto it = entries.begin(); it != entries.end();) {
         auto cur = it++;
         if (str_starts(cur->first, ".backup")) {
-            if (cur->first.length() == 7 || &cur->first[8] == ".magisk"sv) {
+            if (cur->first.length() == 7 || &cur->first[8] == ".shaper"sv) {
                 rm(cur);
             } else {
                 mv(cur, &cur->first[8]);

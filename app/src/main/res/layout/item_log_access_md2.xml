@@ -5,15 +5,15 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.R" />
+        <import type="com.zzqy.shaper.R" />
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.log.LogRvItem" />
+            type="com.zzqy.shaper.ui.log.LogRvItem" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.log.LogViewModel" />
+            type="com.zzqy.shaper.ui.log.LogViewModel" />
 
     </data>
 

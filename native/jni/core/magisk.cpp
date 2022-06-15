@@ -13,10 +13,10 @@ using namespace std;
 
 [[noreturn]] static void usage() {
     fprintf(stderr,
-R"EOF(Magisk - Multi-purpose Utility
+R"EOF(Shaper - Multi-purpose Utility
 
-Usage: magisk [applet [arguments]...]
-   or: magisk [options]...
+Usage: shaper [applet [arguments]...]
+   or: shaper [options]...
 
 Options:
    -c                        print current binary version
@@ -27,17 +27,17 @@ Options:
    --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
-   --daemon                  manually start magisk daemon
-   --stop                    remove all magisk changes and stop daemon
+   --daemon                  manually start shaper daemon
+   --stop                    remove all shaper changes and stop daemon
    --[init trigger]          start service for init trigger
                              Supported init triggers:
                              post-fs-data, service, boot-complete
    --unlock-blocks           set BLKROSET flag to OFF for all block devices
-   --restorecon              restore selinux context on Magisk files
+   --restorecon              restore selinux context on Shaper files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
-   --sqlite SQL              exec SQL commands to Magisk database
-   --path                    print Magisk tmpfs mount path
+   --sqlite SQL              exec SQL commands to Shaper database
+   --path                    print Shaper tmpfs mount path
    --denylist ARGS           denylist config CLI
 
 Available applets:
@@ -49,11 +49,11 @@ Available applets:
     exit(1);
 }
 
-int magisk_main(int argc, char *argv[]) {
+int shaper_main(int argc, char *argv[]) {
     if (argc < 2)
         usage();
     if (argv[1] == "-c"sv) {
-        printf(MAGISK_VERSION ":MAGISK (" str(MAGISK_VER_CODE) ")\n");
+        printf(SHAPER_VERSION ":SHAPER (" str(SHAPER_VER_CODE) ")\n");
         return 0;
     } else if (argv[1] == "-v"sv) {
         int fd = connect_daemon(MainRequest::CHECK_VERSION);

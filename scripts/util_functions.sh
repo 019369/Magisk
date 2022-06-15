@@ -1,8 +1,8 @@
 ############################################
-# Magisk General Utility Functions
+# Shaper General Utility Functions
 ############################################
 
-#MAGISK_VERSION_STUB
+#SHAPER_VERSION_STUB
 
 ###################
 # Helper Functions
@@ -48,8 +48,8 @@ grep_get_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE
-  local PROPPATH='/data/.magisk /cache/.magisk'
-  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  local PROPPATH='/data/.shaper /cache/.shaper'
+  [ ! -z $SHAPERTMP ] && PROPPATH="$SHAPERTMP/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
@@ -68,7 +68,7 @@ abort() {
 }
 
 resolve_vars() {
-  MAGISKBIN=$NVBASE/magisk
+  SHAPERBIN=$NVBASE/shaper
   POSTFSDATAD=$NVBASE/post-fs-data.d
   SERVICED=$NVBASE/service.d
 }
@@ -119,8 +119,8 @@ ensure_bb() {
   local bb
   if [ -f $TMPDIR/busybox ]; then
     bb=$TMPDIR/busybox
-  elif [ -f $MAGISKBIN/busybox ]; then
-    bb=$MAGISKBIN/busybox
+  elif [ -f $SHAPERBIN/busybox ]; then
+    bb=$SHAPERBIN/busybox
   else
     abort "! Cannot find BusyBox"
   fi
@@ -471,8 +471,8 @@ flash_image() {
 }
 
 # Common installation script for flash_script.sh and addon.d.sh
-install_magisk() {
-  cd $MAGISKBIN
+install_shaper() {
+  cd $SHAPERBIN
 
   if [ ! -c $BOOTIMAGE ]; then
     eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
@@ -494,7 +494,7 @@ install_magisk() {
       ;;
   esac
 
-  ./magiskboot cleanup
+  ./shaperboot cleanup
   rm -f new-boot.img
 
   run_migrations
@@ -574,7 +574,7 @@ check_data() {
     touch /data/.rw && rm /data/.rw && DATA=true
     # Test if data is decrypted
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
-    $DATA_DE && [ -d /data/adb/magisk ] || mkdir /data/adb/magisk || DATA_DE=false
+    $DATA_DE && [ -d /data/adb/shaper ] || mkdir /data/adb/shaper || DATA_DE=false
   fi
   NVBASE=/data
   $DATA || NVBASE=/cache/data_adb
@@ -582,24 +582,24 @@ check_data() {
   resolve_vars
 }
 
-find_magisk_apk() {
+find_shaper_apk() {
   local DBAPK
-  [ -z $APK ] && APK=/data/app/com.topjohnwu.magisk*/base.apk
-  [ -f $APK ] || APK=/data/app/*/com.topjohnwu.magisk*/base.apk
+  [ -z $APK ] && APK=/data/app/com.zzqy.shaper*/base.apk
+  [ -f $APK ] || APK=/data/app/*/com.zzqy.shaper*/base.apk
   if [ ! -f $APK ]; then
-    DBAPK=$(magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2)
-    [ -z $DBAPK ] && DBAPK=$(strings $NVBASE/magisk.db | grep -oE 'requester..*' | cut -c10-)
+    DBAPK=$(shaper --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2)
+    [ -z $DBAPK ] && DBAPK=$(strings $NVBASE/shaper.db | grep -oE 'requester..*' | cut -c10-)
     [ -z $DBAPK ] || APK=/data/user_de/0/$DBAPK/dyn/current.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/data/$DBAPK/dyn/current.apk
   fi
-  [ -f $APK ] || ui_print "! Unable to detect Magisk app APK for BootSigner"
+  [ -f $APK ] || ui_print "! Unable to detect Shaper app APK for BootSigner"
 }
 
 run_migrations() {
   local LOCSHA1
   local TARGET
   # Legacy app installation
-  local BACKUP=$MAGISKBIN/stock_boot*.gz
+  local BACKUP=$SHAPERBIN/stock_boot*.gz
   if [ -f $BACKUP ]; then
     cp $BACKUP /data
     rm -f $BACKUP
@@ -610,20 +610,20 @@ run_migrations() {
     [ -f $gz ] || break
     LOCSHA1=`basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//'`
     [ -z $LOCSHA1 ] && break
-    mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
-    mv $gz /data/magisk_backup_${LOCSHA1}/boot.img.gz
+    mkdir /data/shaper_backup_${LOCSHA1} 2>/dev/null
+    mv $gz /data/shaper_backup_${LOCSHA1}/boot.img.gz
   done
 
   # Stock backups
   LOCSHA1=$SHA1
   for name in boot dtb dtbo dtbs; do
-    BACKUP=$MAGISKBIN/stock_${name}.img
+    BACKUP=$SHAPERBIN/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then
-      LOCSHA1=`$MAGISKBIN/magiskboot sha1 $BACKUP`
-      mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
+      LOCSHA1=`$SHAPERBIN/shaperboot sha1 $BACKUP`
+      mkdir /data/shaper_backup_${LOCSHA1} 2>/dev/null
     fi
-    TARGET=/data/magisk_backup_${LOCSHA1}/${name}.img
+    TARGET=/data/shaper_backup_${LOCSHA1}/${name}.img
     cp $BACKUP $TARGET
     rm -f $BACKUP
     gzip -9f $TARGET
@@ -632,35 +632,35 @@ run_migrations() {
 
 copy_sepolicy_rules() {
   # Remove all existing rule folders
-  rm -rf /data/unencrypted/magisk /cache/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
+  rm -rf /data/unencrypted/shaper /cache/shaper /metadata/shaper /persist/shaper /mnt/vendor/persist/shaper
 
   # Find current active RULESDIR
   local RULESDIR
-  local ACTIVEDIR=$(magisk --path)/.magisk/mirror/sepolicy.rules
+  local ACTIVEDIR=$(shaper --path)/.shaper/mirror/sepolicy.rules
   if [ -L $ACTIVEDIR ]; then
     RULESDIR=$(readlink $ACTIVEDIR)
-    [ "${RULESDIR:0:1}" != "/" ] && RULESDIR="$(magisk --path)/.magisk/mirror/$RULESDIR"
+    [ "${RULESDIR:0:1}" != "/" ] && RULESDIR="$(shaper --path)/.shaper/mirror/$RULESDIR"
   elif ! $ISENCRYPTED; then
     RULESDIR=$NVBASE/modules
   elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -qE 'dm-|f2fs'; then
-    RULESDIR=/data/unencrypted/magisk
+    RULESDIR=/data/unencrypted/shaper
   elif grep ' /cache ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/cache/magisk
+    RULESDIR=/cache/shaper
   elif grep ' /metadata ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/metadata/magisk
+    RULESDIR=/metadata/shaper
   elif grep ' /persist ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/persist/magisk
+    RULESDIR=/persist/shaper
   elif grep ' /mnt/vendor/persist ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/mnt/vendor/persist/magisk
+    RULESDIR=/mnt/vendor/persist/shaper
   else
     ui_print "- Unable to find sepolicy rules dir"
     return 1
   fi
 
-  if [ -d ${RULESDIR%/magisk} ]; then
+  if [ -d ${RULESDIR%/shaper} ]; then
     echo "RULESDIR=$RULESDIR" >&2
   else
-    ui_print "- Unable to find sepolicy rules dir ${RULESDIR%/magisk}"
+    ui_print "- Unable to find sepolicy rules dir ${RULESDIR%/shaper}"
     return 1
   fi
 
@@ -773,7 +773,7 @@ install_module() {
     set_permissions
   else
     print_title "$MODNAME" "by $MODAUTH"
-    print_title "Powered by Magisk"
+    print_title "Powered by Shaper"
 
     unzip -o "$ZIPFILE" customize.sh -d $MODPATH >&2
 
@@ -800,7 +800,7 @@ install_module() {
   done
 
   if $BOOTMODE; then
-    # Update info for Magisk app
+    # Update info for Shaper app
     mktouch $NVBASE/modules/$MODID/update
     rm -rf $NVBASE/modules/$MODID/remove 2>/dev/null
     rm -rf $NVBASE/modules/$MODID/disable 2>/dev/null
@@ -839,7 +839,7 @@ NVBASE=/data/adb
 TMPDIR=/dev/tmp
 
 # Bootsigner related stuff
-BOOTSIGNERCLASS=com.topjohnwu.magisk.signing.SignBoot
+BOOTSIGNERCLASS=com.zzqy.shaper.signing.SignBoot
 BOOTSIGNER='/system/bin/dalvikvm -Xnoimage-dex2oat -cp $APK $BOOTSIGNERCLASS'
 BOOTSIGNED=false
 

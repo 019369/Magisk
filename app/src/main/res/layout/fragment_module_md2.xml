@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.core.Config" />
+        <import type="com.zzqy.shaper.core.Config" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
+            type="com.zzqy.shaper.ui.module.ModuleViewModel" />
 
     </data>
 

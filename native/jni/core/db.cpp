@@ -16,7 +16,7 @@ struct sqlite3;
 static sqlite3 *mDB = nullptr;
 
 #define DBLOGV(...)
-//#define DBLOGV(...) LOGD("magiskdb: " __VA_ARGS__)
+//#define DBLOGV(...) LOGD("SHAPERDB: " __VA_ARGS__)
 
 // SQLite APIs
 
@@ -140,7 +140,7 @@ static char *open_and_init_db(sqlite3 *&db) {
     if (!dload_sqlite())
         return strdup("Cannot load libsqlite.so");
 
-    int ret = sqlite3_open_v2(MAGISKDB, &db,
+    int ret = sqlite3_open_v2(SHAPERDB, &db,
             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
     if (ret)
         return strdup(sqlite3_errmsg(db));
@@ -285,7 +285,7 @@ char *db_exec(const char *sql) {
         err = open_and_init_db(mDB);
         db_err_cmd(err,
             // Open fails, remove and reconstruct
-            unlink(MAGISKDB);
+            unlink(SHAPERDB);
             err = open_and_init_db(mDB);
             err_ret(err);
         );
@@ -311,7 +311,7 @@ char *db_exec(const char *sql, const db_row_cb &fn) {
         err = open_and_init_db(mDB);
         db_err_cmd(err,
             // Open fails, remove and reconstruct
-            unlink(MAGISKDB);
+            unlink(SHAPERDB);
             err = open_and_init_db(mDB);
             err_ret(err);
         );

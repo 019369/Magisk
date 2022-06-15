@@ -17,8 +17,8 @@ static void lazy_unmount(const char* mountpoint) {
 void revert_unmount() {
     vector<string> targets;
 
-    // Unmount dummy skeletons and MAGISKTMP
-    targets.push_back(MAGISKTMP);
+    // Unmount dummy skeletons and SHAPERTMP
+    targets.push_back(SHAPERTMP);
     parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
         if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(product) || TMPFS_MNT(system_ext))
             targets.emplace_back(mentry->mnt_dir);

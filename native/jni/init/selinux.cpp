@@ -12,7 +12,7 @@ void MagiskInit::patch_sepolicy(const char *in, const char *out) {
     LOGD("Patching monolithic policy\n");
     auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(in));
 
-    sepol->magisk_rules();
+    sepol->shaper_rules();
 
     // Custom rules
     if (!custom_rules_dir.empty()) {
@@ -140,7 +140,7 @@ bool MagiskInit::hijack_sepolicy() {
 
     // Load and patch policy
     auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(MOCK_LOAD));
-    sepol->magisk_rules();
+    sepol->shaper_rules();
     sepol->load_rules(rules);
 
     // Load patched policy into kernel

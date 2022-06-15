@@ -9,12 +9,12 @@
 using namespace std;
 
 #define INIT_PATH  "/system/bin/init"
-#define REDIR_PATH "/data/magiskinit"
+#define REDIR_PATH "/data/shaperinit"
 
 void FirstStageInit::prepare() {
     xmkdirs("/data", 0755);
     xmount("tmpfs", "/data", "tmpfs", 0, "mode=755");
-    cp_afc("/init" /* magiskinit */, REDIR_PATH);
+    cp_afc("/init" /* shaperinit */, REDIR_PATH);
 
     unlink("/init");
     const char *orig_init = backup_init();
@@ -29,7 +29,7 @@ void FirstStageInit::prepare() {
 
     {
         auto init = mmap_data("/init", true);
-        // Redirect original init to magiskinit
+        // Redirect original init to shaperinit
         init.patch({ make_pair(INIT_PATH, REDIR_PATH) });
     }
 
@@ -53,7 +53,7 @@ void LegacySARInit::first_stage_prep() {
     }
     xmount("/data/init", "/init", nullptr, MS_BIND, nullptr);
 
-    // Replace redirect init with magiskinit
+    // Replace redirect init with shaperinit
     dest = xopen(REDIR_PATH, O_CREAT | O_WRONLY, 0);
     write(dest, self.buf, self.sz);
     fclone_attr(src, dest);

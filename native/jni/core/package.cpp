@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#define ENFORCE_SIGNATURE (!MAGISK_DEBUG)
+#define ENFORCE_SIGNATURE (!SHAPER_DEBUG)
 
 // These functions will be called on every single zygote process specialization and su request,
 // so performance is absolutely critical. Most operations should either have its result cached
@@ -72,7 +72,7 @@ vector<bool> get_app_no_list() {
 
 void preserve_stub_apk() {
     mutex_guard g(pkg_lock);
-    string stub_path = MAGISKTMP + "/stub.apk";
+    string stub_path = SHAPERTMP + "/stub.apk";
     stub_apk_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
     unlink(stub_path.data());
     default_cert = new string(read_certificate(stub_apk_fd));

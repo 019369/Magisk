@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
     }
 
     umask(0);
-    if (base == "magisk" || base == "magisk32" || base == "magisk64") {
+    if (base == "shaper" || base == "shaper32" || base == "shaper64") {
         if (argc > 1 && argv[1][0] != '-') {
-            // Calling applet via magisk [applet] args
+            // Calling applet via shaper [applet] args
             --argc;
             ++argv;
         } else {
-            return magisk_main(argc, argv);
+            return shaper_main(argc, argv);
         }
     }
 

@@ -5,7 +5,7 @@ plugins {
 setupCommon()
 
 android {
-    namespace = "com.topjohnwu.magisk.native"
+    namespace = "com.zzqy.shaper.native"
 
     externalNativeBuild {
         ndkBuild {
@@ -18,8 +18,8 @@ android {
             ndkBuild {
                 // Pass arguments to ndk-build.
                 arguments(
-                    "B_MAGISK=1", "B_INIT=1", "B_BOOT=1", "B_TEST=1", "B_POLICY=1", "B_PRELOAD=1",
-                    "MAGISK_DEBUG=1", "MAGISK_VERSION=debug", "MAGISK_VER_CODE=INT_MAX"
+                    "B_SHAPER=1", "B_INIT=1", "B_BOOT=1", "B_TEST=1", "B_POLICY=1", "B_PRELOAD=1",
+                    "SHAPER_DEBUG=1", "SHAPER_VERSION=debug", "SHAPER_VER_CODE=INT_MAX"
                 )
             }
         }

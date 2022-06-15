@@ -1,6 +1,6 @@
-#MAGISK
+#SHAPER
 ############################################
-# Magisk Uninstaller (updater-script)
+# Shaper Uninstaller (updater-script)
 ############################################
 
 ##############
@@ -29,17 +29,17 @@ setup_flashable
 # Detection
 ############
 
-if echo $MAGISK_VER | grep -q '\.'; then
-  PRETTY_VER=$MAGISK_VER
+if echo $SHAPER_VER | grep -q '\.'; then
+  PRETTY_VER=$SHAPER_VER
 else
-  PRETTY_VER="$MAGISK_VER($MAGISK_VER_CODE)"
+  PRETTY_VER="$SHAPER_VER($SHAPER_VER_CODE)"
 fi
-print_title "Magisk $PRETTY_VER Uninstaller"
+print_title "Shaper $PRETTY_VER Uninstaller"
 
-is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with the Magisk app"
+is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with the Shaper app"
 mount_partitions
 check_data
-$DATA_DE || abort "! Cannot access /data, please uninstall with the Magisk app"
+$DATA_DE || abort "! Cannot access /data, please uninstall with the Shaper app"
 get_flags
 find_boot_image
 
@@ -73,7 +73,7 @@ if [ -c $BOOTIMAGE ]; then
   BOOTNAND=$BOOTIMAGE
   BOOTIMAGE=boot.img
 fi
-./magiskboot unpack "$BOOTIMAGE"
+./shaperboot unpack "$BOOTIMAGE"
 
 case $? in
   1 )
@@ -91,7 +91,7 @@ esac
 # Detect boot image state
 ui_print "- Checking ramdisk status"
 if [ -e ramdisk.cpio ]; then
-  ./magiskboot cpio ramdisk.cpio test
+  ./shaperboot cpio ramdisk.cpio test
   STATUS=$?
 else
   # Stock A only system-as-root
@@ -101,11 +101,11 @@ case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     ;;
-  1 )  # Magisk patched
-    ui_print "- Magisk patched image detected"
+  1 )  # shaper patched
+    ui_print "- Shaper patched image detected"
     # Find SHA1 of stock boot image
-    SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
-    BACKUPDIR=/data/magisk_backup_$SHA1
+    SHA1=$(./shaperboot cpio ramdisk.cpio sha1 2>/dev/null)
+    BACKUPDIR=/data/shaper_backup_$SHA1
     if [ -d $BACKUPDIR ]; then
       ui_print "- Restoring stock boot image"
       flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE
@@ -119,12 +119,12 @@ case $((STATUS & 3)) in
     else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
-      ./magiskboot cpio ramdisk.cpio restore
-      if ! ./magiskboot cpio ramdisk.cpio "exists init"; then
+      ./shaperboot cpio ramdisk.cpio restore
+      if ! ./shaperboot cpio ramdisk.cpio "exists init"; then
         # A only system-as-root
         rm -f ramdisk.cpio
       fi
-      ./magiskboot repack $BOOTIMAGE
+      ./shaperboot repack $BOOTIMAGE
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
       ui_print "- Flashing restored boot image"
@@ -137,14 +137,14 @@ case $((STATUS & 3)) in
     ;;
 esac
 
-ui_print "- Removing Magisk files"
+ui_print "- Removing Shaper files"
 rm -rf \
-/cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
-/data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* \
+/cache/*shaper* /cache/unblock /data/*shaper* /data/cache/*shaper* /data/property/*shaper* \
+/data/Shaper.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*shaper* \
 /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* \
-/data/unencrypted/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
+/data/unencrypted/shaper /metadata/shaper /persist/shaper /mnt/vendor/persist/shaper
 
-ADDOND=/system/addon.d/99-magisk.sh
+ADDOND=/system/addon.d/99-shaper.sh
 if [ -f $ADDOND ]; then
   blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
   mount -o rw,remount /system || mount -o rw,remount /
@@ -155,13 +155,13 @@ cd /
 
 if $BOOTMODE; then
   ui_print "********************************************"
-  ui_print " The Magisk app will uninstall itself, and"
+  ui_print " The Shaper app will uninstall itself, and"
   ui_print " the device will reboot after a few seconds"
   ui_print "********************************************"
   (sleep 8; /system/bin/reboot)&
 else
   ui_print "********************************************"
-  ui_print " The Magisk app will not be uninstalled"
+  ui_print " The Shaper app will not be uninstalled"
   ui_print " Please uninstall it manually after reboot"
   ui_print "********************************************"
   recovery_cleanup

@@ -58,7 +58,7 @@ except FileNotFoundError:
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
-default_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox']
+default_targets = ['shaper', 'shaperinit', 'shaperboot', 'shaperpolicy', 'busybox']
 support_targets = default_targets + ['resetprop', 'test']
 
 sdk_path = os.environ['ANDROID_SDK_ROOT']
@@ -124,6 +124,7 @@ def mkdir_p(path, mode=0o755):
 
 
 def execv(cmd):
+    print("fuck:cmd = "+str(cmd))
     return subprocess.run(cmd, stdout=STDOUT)
 
 
@@ -167,14 +168,14 @@ def load_config(args):
         config.update(parse_props(args.config))
 
     for key, value in parse_props('gradle.properties').items():
-        if key.startswith('magisk.'):
+        if key.startswith('shaper.'):
             config[key[7:]] = value
 
     try:
         config['versionCode'] = int(config['versionCode'])
     except ValueError:
         error('Config error: "versionCode" is required to be an integer')
-
+    print("fuck:config = "+str(config))
     mkdir_p(config['outdir'])
     global STDOUT
     STDOUT = None if args.verbose else subprocess.DEVNULL
@@ -199,7 +200,7 @@ def clean_elf():
                    '-o', elf_cleaner])
     args = [elf_cleaner]
     args.extend(op.join('native', 'out', arch, bin)
-                for arch in archs for bin in ['magisk', 'magiskpolicy'])
+                for arch in archs for bin in ['shaper', 'shaperpolicy'])
     execv(args)
 
 
@@ -278,7 +279,7 @@ def write_if_diff(file_name, text):
 def dump_bin_header(args):
     stub = op.join(config['outdir'], f'stub-{"release" if args.release else "debug"}.apk')
     if not op.exists(stub):
-        error('Build stub APK before building "magiskinit"')
+        error('Build stub APK before building "shaperinit"')
     mkdir_p(native_gen_path)
     with open(stub, 'rb') as src:
         text = binary_dump(src, 'manager_xz')
@@ -295,12 +296,12 @@ def dump_flag_header():
         #pragma once
         #define quote(s)            #s
         #define str(s)              quote(s)
-        #define MAGISK_FULL_VER     MAGISK_VERSION "(" str(MAGISK_VER_CODE) ")"
-        #define NAME_WITH_VER(name) str(name) " " MAGISK_FULL_VER
+        #define SHAPER_FULL_VER     SHAPER_VERSION "(" str(SHAPER_VER_CODE) ")"
+        #define NAME_WITH_VER(name) str(name) " " SHAPER_FULL_VER
         ''')
-    flag_txt += f'#define MAGISK_VERSION      "{config["version"]}"\n'
-    flag_txt += f'#define MAGISK_VER_CODE     {config["versionCode"]}\n'
-    flag_txt += f'#define MAGISK_DEBUG        {0 if args.release else 1}\n'
+    flag_txt += f'#define SHAPER_VERSION      "{config["version"]}"\n'
+    flag_txt += f'#define SHAPER_VER_CODE     {config["versionCode"]}\n'
+    flag_txt += f'#define SHAPER_DEBUG        {0 if args.release else 1}\n'
 
     mkdir_p(native_gen_path)
     write_if_diff(op.join(native_gen_path, 'flags.h'), flag_txt)
@@ -332,16 +333,16 @@ def build_binary(args):
 
     flag = ''
 
-    if 'magisk' in args.target:
-        flag += ' B_MAGISK=1'
+    if 'shaper' in args.target:
+        flag += ' B_SHAPER=1'
 
-    if 'magiskpolicy' in args.target:
+    if 'shaperpolicy' in args.target:
         flag += ' B_POLICY=1'
 
     if 'test' in args.target:
         flag += ' B_TEST=1'
 
-    if 'magiskinit' in args.target:
+    if 'shaperinit' in args.target:
         flag += ' B_PRELOAD=1'
 
     if flag:
@@ -352,14 +353,14 @@ def build_binary(args):
 
     flag = ''
 
-    if 'magiskinit' in args.target:
+    if 'shaperinit' in args.target:
         dump_bin_header(args)
         flag += ' B_INIT=1'
 
     if 'resetprop' in args.target:
         flag += ' B_PROP=1'
 
-    if 'magiskboot' in args.target:
+    if 'shaperboot' in args.target:
         flag += ' B_BOOT=1'
 
     if flag:
@@ -384,10 +385,12 @@ def build_apk(args, module):
     target = op.join(config['outdir'], apk)
     mv(source, target)
     header('Output: ' + target)
+    if "app-" in target:
+        print(cmd_out([adb_path, 'install', '-r', target]))
 
 
 def build_app(args):
-    header('* Building the Magisk app')
+    header('* Building the Shaper app')
     build_apk(args, 'app')
 
 
@@ -452,13 +455,13 @@ def setup_avd(args):
 
     abi = cmd_out([adb_path, 'shell', 'getprop', 'ro.product.cpu.abi'])
     proc = execv([adb_path, 'push', f'native/out/{abi}/busybox', 'out/app-debug.apk',
-           'scripts/avd_magisk.sh', '/data/local/tmp'])
+           'scripts/avd_shaper.sh', '/data/local/tmp'])
     if proc.returncode != 0:
         error('adb push failed!')
 
-    proc = execv([adb_path, 'shell', 'sh', '/data/local/tmp/avd_magisk.sh'])
+    proc = execv([adb_path, 'shell', 'sh', '/data/local/tmp/avd_shaper.sh'])
     if proc.returncode != 0:
-        error('avd_magisk.sh failed!')
+        error('avd_shaper.sh failed!')
 
 
 def patch_avd_ramdisk(args):
@@ -509,7 +512,7 @@ def build_all(args):
     build_app(args)
 
 
-parser = argparse.ArgumentParser(description='Magisk build script')
+parser = argparse.ArgumentParser(description='Shaper build script')
 parser.set_defaults(func=lambda x: None)
 parser.add_argument('-r', '--release', action='store_true',
                     help='compile in release mode')
@@ -529,7 +532,7 @@ binary_parser.add_argument(
     or empty for defaults ({', '.join(default_targets)})")
 binary_parser.set_defaults(func=build_binary)
 
-app_parser = subparsers.add_parser('app', help='build the Magisk app')
+app_parser = subparsers.add_parser('app', help='build the Shaper app')
 app_parser.set_defaults(func=build_app)
 
 stub_parser = subparsers.add_parser('stub', help='build the stub app')
@@ -553,7 +556,7 @@ clean_parser.add_argument(
     'target', nargs='*', help='native, java, or empty to clean both')
 clean_parser.set_defaults(func=cleanup)
 
-ndk_parser = subparsers.add_parser('ndk', help='setup Magisk NDK')
+ndk_parser = subparsers.add_parser('ndk', help='setup Shaper NDK')
 ndk_parser.set_defaults(func=setup_ndk)
 
 if len(sys.argv) == 1:

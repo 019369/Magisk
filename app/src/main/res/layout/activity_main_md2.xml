@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.core.Info" />
+        <import type="com.zzqy.shaper.core.Info" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.MainViewModel" />
+            type="com.zzqy.shaper.ui.MainViewModel" />
 
     </data>
 
@@ -48,7 +48,7 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.topjohnwu.magisk.widget.ConcealableBottomNavigationView
+        <com.zzqy.shaper.widget.ConcealableBottomNavigationView
             android:id="@+id/main_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

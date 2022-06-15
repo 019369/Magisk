@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void sepolicy::magisk_rules() {
+void sepolicy::shaper_rules() {
     // Temp suppress warnings
     auto bak = log_cb.w;
     log_cb.w = nop_log;

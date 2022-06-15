@@ -61,7 +61,7 @@ test_api() {
   timeout 60 adb wait-for-device
   timeout 60 bash -c wait_for_boot
 
-  adb shell magisk -v
+  adb shell shaper -v
   kill -INT $pid
   wait $pid
 }

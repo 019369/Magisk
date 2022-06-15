@@ -19,10 +19,10 @@ kapt {
 }
 
 android {
-    namespace = "com.topjohnwu.magisk"
+    namespace = "com.zzqy.shaper"
 
     defaultConfig {
-        applicationId = "com.topjohnwu.magisk"
+        applicationId = "com.zzqy.shaper"
         vectorDrawables.useSupportLibrary = true
         versionName = Config.version
         versionCode = Config.versionCode

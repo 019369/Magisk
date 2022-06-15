@@ -18,8 +18,8 @@ object Config {
     fun contains(key: String) = get(key) != null
 
     val version: String get() = get("version") ?: commitHash
-    val versionCode: Int get() = get("magisk.versionCode")!!.toInt()
-    val stubVersion: String get() = get("magisk.stubVersion")!!
+    val versionCode: Int get() = get("shaper.versionCode")!!.toInt()
+    val stubVersion: String get() = get("shaper.stubVersion")!!
 }
 
 class MagiskPlugin : Plugin<Project> {

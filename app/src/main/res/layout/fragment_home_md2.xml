@@ -5,15 +5,15 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.core.Info" />
+        <import type="com.zzqy.shaper.core.Info" />
 
-        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+        <import type="com.zzqy.shaper.ui.home.MagiskState" />
 
-        <import type="com.topjohnwu.magisk.ui.home.DeveloperItem" />
+        <import type="com.zzqy.shaper.ui.home.DeveloperItem" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+            type="com.zzqy.shaper.ui.home.HomeViewModel" />
 
     </data>
 

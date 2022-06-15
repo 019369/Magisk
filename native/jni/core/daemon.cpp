@@ -16,7 +16,7 @@
 using namespace std;
 
 int SDK_INT = -1;
-string MAGISKTMP;
+string SHAPERTMP;
 
 bool RECOVERY_MODE = false;
 int DAEMON_STATE = STATE_NONE;
@@ -171,13 +171,13 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
 static void handle_request_sync(int client, int code) {
     switch (code) {
     case MainRequest::CHECK_VERSION:
-        write_string(client, MAGISK_VERSION ":MAGISK");
+        write_string(client, SHAPER_VERSION ":SHAPER");
         break;
     case MainRequest::CHECK_VERSION_CODE:
-        write_int(client, MAGISK_VER_CODE);
+        write_int(client, SHAPER_VER_CODE);
         break;
     case MainRequest::GET_PATH:
-        write_string(client, MAGISKTMP.data());
+        write_string(client, SHAPERTMP.data());
         break;
     case MainRequest::START_DAEMON:
         setup_logfile(true);
@@ -313,7 +313,7 @@ static void daemon_entry() {
 
     start_log_daemon();
 
-    LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
+    LOGI(NAME_WITH_VER(Shaper) " daemon started\n");
 
     // Escape from cgroup
     int pid = getpid();
@@ -327,7 +327,7 @@ static void daemon_entry() {
     // Get self stat
     char buf[64];
     xreadlink("/proc/self/exe", buf, sizeof(buf));
-    MAGISKTMP = dirname(buf);
+    SHAPERTMP = dirname(buf);
     xstat("/proc/self/exe", &self_st);
 
     // Get API level
@@ -350,17 +350,17 @@ static void daemon_entry() {
     restore_tmpcon();
 
     // SAR cleanups
-    auto mount_list = MAGISKTMP + "/" ROOTMNT;
+    auto mount_list = SHAPERTMP + "/" ROOTMNT;
     if (access(mount_list.data(), F_OK) == 0) {
         file_readline(true, mount_list.data(), [](string_view line) -> bool {
             umount2(line.data(), MNT_DETACH);
             return true;
         });
     }
-    rm_rf((MAGISKTMP + "/" ROOTOVL).data());
+    rm_rf((SHAPERTMP + "/" ROOTOVL).data());
 
     // Load config status
-    auto config = MAGISKTMP + "/" INTLROOT "/config";
+    auto config = SHAPERTMP + "/" INTLROOT "/config";
     parse_prop_file(config.data(), [](auto key, auto val) -> bool {
         if (key == "RECOVERYMODE" && val == "true")
             RECOVERY_MODE = true;
@@ -369,7 +369,7 @@ static void daemon_entry() {
 
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {
-        auto pts = MAGISKTMP + "/" SHELLPTS;
+        auto pts = SHAPERTMP + "/" SHELLPTS;
         if (access(pts.data(), F_OK)) {
             xmkdirs(pts.data(), 0755);
             xmount("devpts", pts.data(), "devpts",

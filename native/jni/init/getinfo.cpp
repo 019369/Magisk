@@ -151,7 +151,7 @@ void setup_klog() {
     setbuf(kmsg, nullptr);
     log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
     log_cb.ex = nop_ex;
-    strcpy(kmsg_buf, "magiskinit: ");
+    strcpy(kmsg_buf, "shaperinit: ");
 
     // Disable kmsg rate limiting
     if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w")) {
@@ -230,7 +230,7 @@ void load_kernel_info(BootConfig *config) {
     config->set(parse_cmdline(full_read("/proc/cmdline")));
     config->set(parse_bootconfig(full_read("/proc/bootconfig")));
 
-    parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
+    parse_prop_file("/.backup/.shaper", [=](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
             config->skip_initramfs = config->emulator || !check_key_combo();
             return false;

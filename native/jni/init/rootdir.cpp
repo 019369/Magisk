@@ -45,7 +45,7 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     // Inject custom rc scripts
     for (auto &script : rc_list) {
         // Replace template arguments of rc scripts with dynamic paths
-        replace_all(script, "${MAGISKTMP}", tmp_dir);
+        replace_all(script, "${SHAPERTMP}", tmp_dir);
         fprintf(rc, "\n%s\n", script.data());
     }
     rc_list.clear();
@@ -55,7 +55,7 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     gen_rand_str(pfd_svc, sizeof(pfd_svc));
     gen_rand_str(ls_svc, sizeof(ls_svc));
     gen_rand_str(bc_svc, sizeof(bc_svc));
-    LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
+    LOGD("Inject shaper services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
     fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc, bc_svc);
 
     fclose(rc);
@@ -138,10 +138,10 @@ void SARBase::backup_files() {
         backup_folder("/data/overlay.d", overlays);
 
     self = mmap_data("/proc/self/exe");
-    if (access("/.backup/.magisk", R_OK) == 0)
-        magisk_cfg = mmap_data("/.backup/.magisk");
-    else if (access("/data/.backup/.magisk", R_OK) == 0)
-        magisk_cfg = mmap_data("/data/.backup/.magisk");
+    if (access("/.backup/.shaper", R_OK) == 0)
+        magisk_cfg = mmap_data("/.backup/.shaper");
+    else if (access("/data/.backup/.shaper", R_OK) == 0)
+        magisk_cfg = mmap_data("/data/.backup/.shaper");
 }
 
 static void patch_socket_name(const char *path) {
@@ -153,25 +153,25 @@ static void patch_socket_name(const char *path) {
 }
 
 static void extract_files(bool sbin) {
-    const char *m32 = sbin ? "/sbin/magisk32.xz" : "magisk32.xz";
-    const char *m64 = sbin ? "/sbin/magisk64.xz" : "magisk64.xz";
+    const char *m32 = sbin ? "/sbin/shaper32.xz" : "shaper32.xz";
+    const char *m64 = sbin ? "/sbin/shaper64.xz" : "shaper64.xz";
 
     auto magisk = mmap_data(m32);
     unlink(m32);
-    int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
+    int fd = xopen("shaper32", O_WRONLY | O_CREAT, 0755);
     unxz(fd, magisk.buf, magisk.sz);
     close(fd);
-    patch_socket_name("magisk32");
+    patch_socket_name("shaper32");
     if (access(m64, F_OK) == 0) {
         magisk = mmap_data(m64);
         unlink(m64);
-        fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
+        fd = xopen("shaper64", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk.buf, magisk.sz);
         close(fd);
-        patch_socket_name("magisk64");
-        xsymlink("./magisk64", "magisk");
+        patch_socket_name("shaper64");
+        xsymlink("./shaper64", "shaper");
     } else {
-        xsymlink("./magisk32", "magisk");
+        xsymlink("./shaper32", "shaper");
     }
 
     dump_manager("stub.apk", 0);
@@ -260,13 +260,13 @@ void SARBase::patch_ro_root() {
 
 void RootFSInit::prepare() {
     self = mmap_data("/init");
-    magisk_cfg = mmap_data("/.backup/.magisk");
+    magisk_cfg = mmap_data("/.backup/.shaper");
 
     LOGD("Restoring /init\n");
     rename(backup_init(), "/init");
 }
 
-#define PRE_TMPDIR "/magisk-tmp"
+#define PRE_TMPDIR "/shaper-tmp"
 
 void MagiskInit::patch_rw_root() {
     // Create hardlink mirror of /sbin to /root
@@ -306,7 +306,7 @@ void MagiskInit::patch_rw_root() {
     chdir("/");
 
     // Dump magiskinit as magisk
-    int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+    int fd = xopen("/sbin/shaper", O_WRONLY | O_CREAT, 0755);
     write(fd, self.buf, self.sz);
     close(fd);
 }
@@ -318,7 +318,7 @@ int magisk_proxy_main(int argc, char *argv[]) {
     // Mount rootfs as rw to do post-init rootfs patches
     xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
-    unlink("/sbin/magisk");
+    unlink("/sbin/shaper");
 
     // Move tmpfs to /sbin
     // For some reason MS_MOVE won't work, as a workaround bind mount then unmount
@@ -331,6 +331,6 @@ int magisk_proxy_main(int argc, char *argv[]) {
 
     // Tell magiskd to remount rootfs
     setenv("REMOUNT_ROOT", "1", 1);
-    execv("/sbin/magisk", argv);
+    execv("/sbin/shaper", argv);
     return 1;
 }

@@ -88,26 +88,26 @@ fun Project.setupApp() {
         into("src/main/jniLibs")
         into("armeabi-v7a") {
             from(rootProject.file("native/out/armeabi-v7a")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
+                include("busybox", "shaperboot", "shaperinit", "shaperpolicy", "shaper")
+                rename { if (it == "shaper") "libshaper32.so" else "lib$it.so" }
             }
         }
         into("x86") {
             from(rootProject.file("native/out/x86")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
+                include("busybox", "shaperboot", "shaperinit", "shaperpolicy", "shaper")
+                rename { if (it == "shaper") "libshaper32.so" else "lib$it.so" }
             }
         }
         into("arm64-v8a") {
             from(rootProject.file("native/out/arm64-v8a")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+                include("busybox", "shaperboot", "shaperinit", "shaperpolicy", "shaper")
+                rename { if (it == "shaper") "libshaper64.so" else "lib$it.so" }
             }
         }
         into("x86_64") {
             from(rootProject.file("native/out/x86_64")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+                include("busybox", "shaperboot", "shaperinit", "shaperpolicy", "shaper")
+                rename { if (it == "shaper") "libshaper64.so" else "lib$it.so" }
             }
         }
         onlyIf {
@@ -136,8 +136,8 @@ fun Project.setupApp() {
         filesMatching("**/util_functions.sh") {
             filter {
                 it.replace(
-                    "#MAGISK_VERSION_STUB",
-                    "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
+                    "#SHAPER_VERSION_STUB",
+                    "SHAPER_VER='${Config.version}'\nSHAPER_VER_CODE=${Config.versionCode}"
                 )
             }
             filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
@@ -160,7 +160,7 @@ fun Project.setupApp() {
 
         val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")
-        val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
+        val outSrc = File(outSrcDir, "com/zzqy/shaper/signing/KeyData.java")
 
         val genSrcTask = tasks.register("generate${name.capitalize(Locale.ROOT)}KeyData") {
             inputs.dir(keysDir)
@@ -213,14 +213,14 @@ fun Project.setupStub() {
                     newApk.use { new ->
                         new.setLevel(Deflater.BEST_COMPRESSION)
                         new.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        it.getInputStream(it.getEntry("AndroidManifest.xml")).transferTo(new)
+                        it.getInputStream(it.getEntry("AndroidManifest.xml")).copyTo(new)
                         new.closeEntry()
                         new.finish()
                     }
                     ZipOutputStream(buffer).use { arsc ->
                         arsc.setLevel(Deflater.BEST_COMPRESSION)
                         arsc.putNextEntry(ZipEntry("resources.arsc"))
-                        it.getInputStream(it.getEntry("resources.arsc")).transferTo(arsc)
+                        it.getInputStream(it.getEntry("resources.arsc")).copyTo(arsc)
                         arsc.closeEntry()
                         arsc.finish()
                     }

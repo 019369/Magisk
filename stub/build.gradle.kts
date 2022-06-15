@@ -9,7 +9,7 @@ paranoid {
 }
 
 android {
-    namespace = "com.topjohnwu.magisk"
+    namespace = "com.zzqy.shaper"
 
     val canary = !Config.version.contains(".")
 
@@ -17,7 +17,7 @@ android {
     else "https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@${Config.version}/app-release.apk"
 
     defaultConfig {
-        applicationId = "com.topjohnwu.magisk"
+        applicationId = "com.zzqy.shaper"
         versionCode = 1
         versionName = "1.0"
         buildConfigField("int", "STUB_VERSION", Config.stubVersion)

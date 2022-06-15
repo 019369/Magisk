@@ -1,6 +1,6 @@
 #!/system/bin/sh
 #######################################################################################
-# Magisk Boot Image Patcher
+# Shaper Boot Image Patcher
 #######################################################################################
 #
 # Usage: boot_patch.sh <bootimage>
@@ -12,14 +12,14 @@
 #
 # File name          Type      Description
 #
-# boot_patch.sh      script    A script to patch boot image for Magisk.
+# boot_patch.sh      script    A script to patch boot image for Shaper.
 #                  (this file) The script will use files in its same
 #                              directory to complete the patching process
 # util_functions.sh  script    A script which hosts all functions required
 #                              for this script to work properly
-# magiskinit         binary    The binary to replace /init
-# magisk(32/64)      binary    The magisk binaries
-# magiskboot         binary    A tool to manipulate boot images
+# shaperinit         binary    The binary to replace /init
+# shaper(32/64)      binary    The shaper binaries
+# shaperboot         binary    A tool to manipulate boot images
 # chromeos           folder    This folder includes the utility and keys to sign
 #                  (optional)  chromeos boot images. Only used for Pixel C.
 #
@@ -85,7 +85,7 @@ chmod -R 755 .
 CHROMEOS=false
 
 ui_print "- Unpacking boot image"
-./magiskboot unpack "$BOOTIMAGE"
+./shaperboot unpack "$BOOTIMAGE"
 
 case $? in
   0 ) ;;
@@ -108,7 +108,7 @@ esac
 # Test patch status and do restore
 ui_print "- Checking ramdisk status"
 if [ -e ramdisk.cpio ]; then
-  ./magiskboot cpio ramdisk.cpio test
+  ./shaperboot cpio ramdisk.cpio test
   STATUS=$?
 else
   # Stock A only legacy SAR, or some Android 13 GKIs
@@ -117,15 +117,15 @@ fi
 case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
-    SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
+    SHA1=$(./shaperboot sha1 "$BOOTIMAGE" 2>/dev/null)
     cat $BOOTIMAGE > stock_boot.img
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
-  1 )  # Magisk patched
-    ui_print "- Magisk patched boot image detected"
+  1 )  # Shaper patched
+    ui_print "- Shaper patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
-    ./magiskboot cpio ramdisk.cpio restore
+    [ -z $SHA1 ] && SHA1=$(./shaperboot cpio ramdisk.cpio sha1 2>/dev/null)
+    ./shaperboot cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     rm -f stock_boot.img
     ;;
@@ -156,50 +156,50 @@ echo "RECOVERYMODE=$RECOVERYMODE" >> config
 # Compress to save precious ramdisk space
 SKIP32="#"
 SKIP64="#"
-if [ -f magisk32 ]; then
-  ./magiskboot compress=xz magisk32 magisk32.xz
+if [ -f shaper32 ]; then
+  ./shaperboot compress=xz shaper32 shaper32.xz
   unset SKIP32
 fi
-if [ -f magisk64 ]; then
-  ./magiskboot compress=xz magisk64 magisk64.xz
+if [ -f shaper64 ]; then
+  ./shaperboot compress=xz shaper64 shaper64.xz
   unset SKIP64
 fi
 
-./magiskboot cpio ramdisk.cpio \
-"add 0750 $INIT magiskinit" \
+./shaperboot cpio ramdisk.cpio \
+"add 0750 $INIT shaperinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
-"$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
-"$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
+"$SKIP32 add 0644 overlay.d/sbin/shaper32.xz shaper32.xz" \
+"$SKIP64 add 0644 overlay.d/sbin/shaper64.xz shaper64.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
-"add 000 .backup/.magisk config"
+"add 000 .backup/.shaper config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz
+rm -f ramdisk.cpio.orig config shaper*.xz
 
 #################
 # Binary Patches
 #################
 
 for dt in dtb kernel_dtb extra; do
-  [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patch fstab in $dt"
+  [ -f $dt ] && ./shaperboot dtb $dt patch && ui_print "- Patch fstab in $dt"
 done
 
 if [ -f kernel ]; then
   # Remove Samsung RKP
-  ./magiskboot hexpatch kernel \
+  ./shaperboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
   A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
   # Remove Samsung defex
   # Before: [mov w2, #-221]   (-__NR_execve)
   # After:  [mov w2, #-32768]
-  ./magiskboot hexpatch kernel 821B8012 E2FF8F12
+  ./shaperboot hexpatch kernel 821B8012 E2FF8F12
 
   # Force kernel to load rootfs
   # skip_initramfs -> want_initramfs
-  ./magiskboot hexpatch kernel \
+  ./shaperboot hexpatch kernel \
   736B69705F696E697472616D667300 \
   77616E745F696E697472616D667300
 fi
@@ -209,7 +209,7 @@ fi
 #################
 
 ui_print "- Repacking boot image"
-./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+./shaperboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos

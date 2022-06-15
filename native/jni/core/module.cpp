@@ -517,28 +517,28 @@ void tmpfs_node::mount() {
  * Magisk Stuffs
  ****************/
 
-class magisk_node : public node_entry {
+class shaper_node : public node_entry {
 public:
-    explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
+    explicit shaper_node(const char *name) : node_entry(name, DT_REG, this) {}
 
     void mount() override {
         const string &dir_name = parent()->node_path();
-        if (name() == "magisk") {
+        if (name() == "shaper") {
             for (int i = 0; applet_names[i]; ++i) {
                 string dest = dir_name + "/" + applet_names[i];
-                VLOGD("create", "./magisk", dest.data());
-                xsymlink("./magisk", dest.data());
+                VLOGD("create", "./shaper", dest.data());
+                xsymlink("./shaper", dest.data());
             }
         } else {
             string dest = dir_name + "/supolicy";
-            VLOGD("create", "./magiskpolicy", dest.data());
-            xsymlink("./magiskpolicy", dest.data());
+            VLOGD("create", "./shaperpolicy", dest.data());
+            xsymlink("./shaperpolicy", dest.data());
         }
-        create_and_mount(MAGISKTMP + "/" + name());
+        create_and_mount(SHAPERTMP + "/" + name());
     }
 };
 
-static void inject_magisk_bins(root_node *system) {
+static void inject_shaper_bins(root_node *system) {
     auto bin = system->child<inter_node>("bin");
     if (!bin) {
         bin = new inter_node("bin", "");
@@ -546,8 +546,8 @@ static void inject_magisk_bins(root_node *system) {
     }
 
     // Insert binaries
-    bin->insert(new magisk_node("magisk"));
-    bin->insert(new magisk_node("magiskpolicy"));
+    bin->insert(new shaper_node("shaper"));
+    bin->insert(new shaper_node("shaperpolicy"));
 
     // Also delete all applets to make sure no modules can override it
     for (int i = 0; applet_names[i]; ++i)
@@ -563,7 +563,7 @@ int app_process_64 = -1;
 if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
     app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
     string zbin = zygisk_bin + "/app_process" #bit;                                     \
-    string mbin = MAGISKTMP + "/magisk" #bit;                                           \
+    string mbin = SHAPERTMP + "/shaper" #bit;                                           \
     int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
     int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
     xsendfile(out, src, nullptr, INT_MAX);                                              \
@@ -574,8 +574,8 @@ if (access("/system/bin/app_process" #bit, F_OK) == 0) {                        
 }
 
 void magic_mount() {
-    node_entry::mirror_dir = MAGISKTMP + "/" MIRRDIR;
-    node_entry::module_mnt = MAGISKTMP + "/" MODULEMNT "/";
+    node_entry::mirror_dir = SHAPERTMP + "/" MIRRDIR;
+    node_entry::module_mnt = SHAPERTMP + "/" MODULEMNT "/";
 
     auto root = make_unique<root_node>("");
     auto system = new root_node("system");
@@ -585,7 +585,7 @@ void magic_mount() {
     LOGI("* Loading modules\n");
     for (const auto &m : *module_list) {
         const char *module = m.name.data();
-        char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
+        char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", SHAPERTMP.data(), module);
 
         // Read props
         strcpy(b, "system.prop");
@@ -610,9 +610,9 @@ void magic_mount() {
         system->collect_files(module, fd);
         close(fd);
     }
-    if (MAGISKTMP != "/sbin") {
+    if (SHAPERTMP != "/sbin") {
         // Need to inject our binaries into /system/bin
-        inject_magisk_bins(system);
+        inject_shaper_bins(system);
     }
 
     if (!system->is_empty()) {
@@ -632,7 +632,7 @@ void magic_mount() {
 
     // Mount on top of modules to enable zygisk
     if (zygisk_enabled) {
-        string zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
+        string zygisk_bin = SHAPERTMP + "/" ZYGISKBIN;
         mkdir(zygisk_bin.data(), 0);
         mount_zygisk(32)
         mount_zygisk(64)
@@ -665,8 +665,8 @@ static void prepare_modules() {
     }
 
     // Setup module mount (workaround nosuid selabel issue)
-    auto src = MAGISKTMP + "/" MIRRDIR MODULEROOT;
-    auto dest = MAGISKTMP + "/" MODULEMNT;
+    auto src = SHAPERTMP + "/" MIRRDIR MODULEROOT;
+    auto dest = SHAPERTMP + "/" MODULEMNT;
     xmkdir(dest.data(), 0755);
     bind_mount(src.data(), dest.data());
 

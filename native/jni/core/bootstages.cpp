@@ -26,8 +26,8 @@ bool zygisk_enabled = false;
 
 #define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
 #define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
-#define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
+#define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, SHAPERTMP.data())
+#define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, SHAPERTMP.data())
 
 #define do_mount_mirror(part) {     \
     SETMIR(buf1, part);             \
@@ -117,10 +117,10 @@ static void mount_mirrors() {
     link_mirror(system_ext)
 }
 
-static bool magisk_env() {
+static bool shaper_env() {
     char buf[4096];
 
-    LOGI("* Initializing Magisk environment\n");
+    LOGI("* Initializing Shaper environment\n");
 
     preserve_stub_apk();
     string pkg;
@@ -130,7 +130,7 @@ static bool magisk_env() {
             pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
 
     // Alternative binaries paths
-    const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
+    const char *alt_bin[] = { "/cache/data_adb/shaper", "/data/shaper", buf };
     for (auto alt : alt_bin) {
         struct stat st{};
         if (lstat(alt, &st) == 0) {
@@ -155,14 +155,14 @@ static bool magisk_env() {
     if (access(DATABIN "/busybox", X_OK))
         return false;
 
-    sprintf(buf, "%s/" BBPATH "/busybox", MAGISKTMP.data());
+    sprintf(buf, "%s/" BBPATH "/busybox", SHAPERTMP.data());
     mkdir(dirname(buf), 0755);
     cp_afc(DATABIN "/busybox", buf);
     exec_command_async(buf, "--install", "-s", dirname(buf));
 
-    if (access(DATABIN "/magiskpolicy", X_OK) == 0) {
-        sprintf(buf, "%s/magiskpolicy", MAGISKTMP.data());
-        cp_afc(DATABIN "/magiskpolicy", buf);
+    if (access(DATABIN "/shaperpolicy", X_OK) == 0) {
+        sprintf(buf, "%s/shaperpolicy", SHAPERTMP.data());
+        cp_afc(DATABIN "/shaperpolicy", buf);
     }
 
     return true;
@@ -307,8 +307,8 @@ void post_fs_data(int client) {
         }
     }
 
-    if (!magisk_env()) {
-        LOGE("* Magisk environment incomplete, abort\n");
+    if (!shaper_env()) {
+        LOGE("* Shaper environment incomplete, abort\n");
         goto early_abort;
     }
 
