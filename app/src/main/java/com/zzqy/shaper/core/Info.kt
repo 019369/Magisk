@@ -10,6 +10,7 @@ import com.zzqy.shaper.di.AppContext
 import com.zzqy.shaper.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
+import android.util.Log
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -52,9 +53,17 @@ object Info {
     }
 
     private fun loadState() = Env(
-        fastCmd("magisk -v").split(":".toRegex())[0],
-        runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
+        testCmd("shaper -v").split(":".toRegex())[0],
+        runCatching { testCmd("shaper -V").toInt() }.getOrDefault(-1)
     )
+
+    fun testCmd(cmd:String): String {
+        var res = fastCmd(cmd)
+        Log.i("fuckShaper","- testCmd :cmd = "+cmd+",res = "+res)
+        Log.i("fuckShaper","- testCmd :isRooted = "+isRooted)
+        Log.i("fuckShaper","- testCmd :Const.Version.MIN_VERCODE = "+Const.Version.MIN_VERCODE)
+        return res
+    }
 
     class Env(
         val versionString: String = "",
@@ -66,5 +75,7 @@ object Info {
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
         val isActive = versionCode >= 0
+        val versionStr = versionString
+        val pastCode = code
     }
 }

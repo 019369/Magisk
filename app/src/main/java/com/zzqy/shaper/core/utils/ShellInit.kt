@@ -15,9 +15,14 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.util.jar.JarFile
+import android.util.Log
+
 
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
+
+        Log.i("fuckShaper","- onInit :shell.isRoot = "+shell.isRoot)
+        Log.i("fuckShaper","- onInit :"+Log.getStackTraceString(Throwable()))
         if (shell.isRoot) {
             Info.isRooted = true
             RootUtils.bindTask?.let { shell.execTask(it) }

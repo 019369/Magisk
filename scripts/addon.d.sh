@@ -141,9 +141,9 @@ case "$1" in
   post-restore)
     initialize
     if $backuptool_ab; then
-      su=sh
-      $BOOTMODE && su=su
-      exec $su -c "sh $0 addond-v2"
+      yu=sh
+      $BOOTMODE && yu=yu
+      exec $yu -c "sh $0 addond-v2"
     else
       # Run in background, hack for addon.d-v1
       (main) &

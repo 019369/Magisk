@@ -10,7 +10,7 @@ using namespace std;
 
 using main_fun = int (*)(int, char *[]);
 
-constexpr const char *applets[] = { "su", "resetprop", "zygisk", nullptr };
+constexpr const char *applets[] = { "yu", "resetprop", "zygisk", nullptr };
 static main_fun applet_mains[] = { su_client_main, resetprop_main, zygisk_main, nullptr };
 
 static int call_applet(int argc, char *argv[]) {

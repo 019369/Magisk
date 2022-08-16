@@ -52,6 +52,15 @@ MAGISK_LOG = SHAPER_LOG
     com.zzqy.shaper.core.model.module.LocalModule
     com.zzqy.shaper.data.repository.LogRepository
 
+    com.zzqy.shaper.core.Info
+    com.zzqy.shaper.core.Receiver
+    com.zzqy.shaper.core.magiskdb.MagiskDB
+    com.zzqy.shaper.ui.deny.DenyListRvItem
+    com.zzqy.shaper.ui.deny.DenyListViewModel
+    com.zzqy.shaper.ui.MainActivity
+    com.zzqy.shaper.ui.settings.Customization
+
+
 ----c
     native/jni/base/logging.cpp
     native/jni/core/package.cpp
@@ -77,7 +86,8 @@ MAGISK_LOG = SHAPER_LOG
     native/jni/zygisk/deny/cli.cpp
     native/jni/init/init.cpp
     native/jni/zygisk/main.cpp
-
+    native/jni/core/applets.cpp
+    native/jni/include/magisk.hpp
 
 
 ----sh

@@ -12,7 +12,7 @@ open class MagiskDB {
         mapper: suspend (Map<String, String>) -> R
     ): List<R> {
         return withContext(Dispatchers.IO) {
-            val out = Shell.cmd("magisk --sqlite '$query'").await().out
+            val out = Shell.cmd("shaper --sqlite '$query'").await().out
             out.map { line ->
                 line.split("\\|".toRegex())
                     .map { it.split("=", limit = 2) }

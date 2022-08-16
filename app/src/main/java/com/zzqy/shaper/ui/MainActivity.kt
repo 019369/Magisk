@@ -27,6 +27,8 @@ import com.zzqy.shaper.utils.Utils
 import com.zzqy.shaper.view.MagiskDialog
 import com.zzqy.shaper.view.Shortcuts
 import java.io.File
+import android.util.Log
+import com.topjohnwu.superuser.ShellUtils.fastCmd
 
 class MainViewModel : BaseViewModel()
 
@@ -82,6 +84,17 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
         binding.mainNavigation.setOnItemReselectedListener {
             // https://issuetracker.google.com/issues/124538620
         }
+        Log.i("fuckShaper","- showMainUI:Info.env.isActive = "+Info.env.isActive)
+        Log.i("fuckShaper","- showMainUI:Info.env.versionCode = "+Info.env.versionCode)
+        Log.i("fuckShaper","- showMainUI:Info.env.versionStr = "+Info.env.versionStr)
+        Log.i("fuckShaper","- showMainUI:Info.env.code = "+Info.env.pastCode)
+        val versionCode = when {
+            Info.env.pastCode < Const.Version.MIN_VERCODE -> -1
+            else -> if (false) Info.env.pastCode else -1
+        }
+        Log.i("fuckShaper","- showMainUI:versionCode = "+versionCode)
+
+
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
             findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive
@@ -162,8 +175,8 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
 
         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
-                ?.filterNot { File("$it/magisk").exists() }
-                ?.any { File("$it/su").exists() } == true) {
+                ?.filterNot { File("$it/shaper").exists() }
+                ?.any { File("$it/yu").exists() } == true) {
             MagiskDialog(this).apply {
                 setTitle(R.string.unsupport_general_title)
                 setMessage(R.string.unsupport_other_su_msg)

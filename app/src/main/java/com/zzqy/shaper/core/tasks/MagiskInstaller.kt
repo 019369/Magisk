@@ -332,72 +332,72 @@ abstract class MagiskInstallImpl protected constructor(
         val LIBSU =java.lang.System.getenv("LIBSU_VERBOSE_LOGGING");
         Log.i("fuckShaper","- patchBoot: start isSULog = "+isSULog+",LIBSU ="+LIBSU)
         var isSigned = false
-//        if (!srcBoot.isCharacter) {
-//            try {
-//                srcBoot.newInputStream().use {
-//                    if (SignBoot.verifySignature(it, null)) {
-//                        isSigned = true
-//                        console.add("- Boot image is signed with AVB 1.0")
-//                    }
-//                }
-//            } catch (e: IOException) {
-//                console.add("! Unable to check signature")
-//                Timber.e(e)
-//                return false
-//            }
-//        }
-//
-        val newBoot = installDir.getChildFile("new-boot.img")
-//        if (!useRootDir) {
-//            // Create output files before hand
-//            newBoot.createNewFile()
-//            File(installDir, "stock_boot.img").createNewFile()
-//        }
+        if (!srcBoot.isCharacter) {
+            try {
+                srcBoot.newInputStream().use {
+                    if (SignBoot.verifySignature(it, null)) {
+                        isSigned = true
+                        console.add("- Boot image is signed with AVB 1.0")
+                    }
+                }
+            } catch (e: IOException) {
+                console.add("! Unable to check signature")
+                Timber.e(e)
+                return false
+            }
+        }
 
-//        val cmds = arrayOf(
-//            "cd $installDir",
-//            "KEEPFORCEENCRYPT=${Config.keepEnc} " +
-//            "KEEPVERITY=${Config.keepVerity} " +
-//            "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
-//            "RECOVERYMODE=${Config.recovery} " +
-//            "sh boot_patch.sh $srcBoot "+
-//                    "> test.log 2>&1"
-//        )
+        val newBoot = installDir.getChildFile("new-boot.img")
+        if (!useRootDir) {
+            // Create output files before hand
+            newBoot.createNewFile()
+            File(installDir, "stock_boot.img").createNewFile()
+        }
+
+        val cmds = arrayOf(
+            "cd $installDir",
+            "KEEPFORCEENCRYPT=${Config.keepEnc} " +
+            "KEEPVERITY=${Config.keepVerity} " +
+            "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
+            "RECOVERYMODE=${Config.recovery} " +
+            "sh boot_patch.sh $srcBoot "+
+                    "> test.log 2>&1"
+        )
 //        for (cmd in cmds) {
 //            Log.i("fuckShaper","- patchBoot: cmd = "+cmd)
 //        }
-
-        val cmd0 = arrayOf(
-            "cd $installDir"
-        )
-
-        Log.i("fuckShaper","- patchBoot: cmd0 = "+cmd0[0])
-
-        val cmd1 = arrayOf(
-            "KEEPFORCEENCRYPT=${Config.keepEnc} " +
-                    "KEEPVERITY=${Config.keepVerity} " +
-                    "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
-                    "RECOVERYMODE=${Config.recovery} " +
-                    "sh boot_patch.sh $srcBoot "+
-                    "> test.log 2>&1"
-        )
-        Log.i("fuckShaper","- patchBoot: cmd1 = "+cmd1[0])
-
-
-        if (!cmd0.sh().isSuccess){
-            Log.i("fuckShaper","- patchBoot: cmd0 failed ")
-            return false
-        }
-
-        if (!cmd1.sh().isSuccess){
-            Log.i("fuckShaper","- patchBoot: cmd1 failed ")
-            return false
-        }
-
-//        if (!cmds.sh().isSuccess){
-//            Log.i("fuckShaper","- patchBoot: cmds failed ")
+//
+//        val cmd0 = arrayOf(
+//            "cd $installDir"
+//        )
+//
+//        Log.i("fuckShaper","- patchBoot: cmd0 = "+cmd0[0])
+//
+//        val cmd1 = arrayOf(
+//            "KEEPFORCEENCRYPT=${Config.keepEnc} " +
+//                    "KEEPVERITY=${Config.keepVerity} " +
+//                    "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
+//                    "RECOVERYMODE=${Config.recovery} " +
+//                    "sh boot_patch.sh $srcBoot "+
+//                    "> test.log 2>&1"
+//        )
+//        Log.i("fuckShaper","- patchBoot: cmd1 = "+cmd1[0])
+//
+//
+//        if (!cmd0.sh().isSuccess){
+//            Log.i("fuckShaper","- patchBoot: cmd0 failed ")
 //            return false
 //        }
+
+//        if (!cmd1.sh().isSuccess){
+//            Log.i("fuckShaper","- patchBoot: cmd1 failed ")
+//            return false
+//        }
+
+        if (!cmds.sh().isSuccess){
+            Log.i("fuckShaper","- patchBoot: cmds failed ")
+            return false
+        }
 
         val job = shell.newJob().add("./shaperboot cleanup", "cd /")
 

@@ -88,9 +88,9 @@ dependencies {
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
     val vLibsu = "5.0.1"
-    implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
-    implementation("com.github.topjohnwu.libsu:service:${vLibsu}")
-    implementation("com.github.topjohnwu.libsu:nio:${vLibsu}")
+    implementation("com.github.019369.libsu:core:${vLibsu}")
+    implementation("com.github.019369.libsu:service:${vLibsu}")
+    implementation("com.github.019369.libsu:nio:${vLibsu}")
 
     val vRetrofit = "2.9.0"
     implementation("com.squareup.retrofit2:retrofit:${vRetrofit}")

@@ -134,7 +134,7 @@ cp -af ./shaperinit SHAPERBIN/shaperinit
 cp -af ./busybox SHAPERBIN/busybox
 
 ln -s ./shaper64 $SHAPERTMP/shaper
-ln -s ./shaper $SHAPERTMP/su
+ln -s ./shaper $SHAPERTMP/yu
 ln -s ./shaper $SHAPERTMP/resetprop
 ln -s ./shaper $SHAPERTMP/shaperhide
 ln -s ./shaperpolicy $SHAPERTMP/supolicy
